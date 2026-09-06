@@ -1,0 +1,56 @@
+name: Chrome Hearts Monitor
+
+on:
+  schedule:
+    - cron: "0 * * * *"
+  workflow_dispatch: {}
+  push:
+    branches: [ main ]
+
+concurrency:
+  group: ch-monitor
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install deps
+        run: pip install -r requirements.txt
+
+      - name: Run monitor
+        env:
+          SERVERCHAN_SENDKEY: ${{ secrets.SERVERCHAN_SENDKEY }}
+          PUSHPLUS_TOKEN:     ${{ secrets.PUSHPLUS_TOKEN }}
+          PUSHPLUS_TOPIC:     ${{ secrets.PUSHPLUS_TOPIC }}
+          BARK_KEY:           ${{ secrets.BARK_KEY }}
+          WEBHOOK_URL:        ${{ secrets.WEBHOOK_URL }}
+          CH_CATEGORIES:       ${{ vars.CH_CATEGORIES }}
+          NOTIFY_PRICE_CHANGE: ${{ vars.NOTIFY_PRICE_CHANGE }}
+          NOTIFY_REMOVED:      ${{ vars.NOTIFY_REMOVED }}
+          NOTIFY_SOLDOUT:      ${{ vars.NOTIFY_SOLDOUT }}
+          DETAIL_FETCH:        ${{ vars.DETAIL_FETCH }}
+        run: python chrome_hearts_monitor.py
+
+      - name: Commit state
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if [ -n "$(git status --porcelain data/state.json)" ]; then
+            git add data/state.json
+            git commit -m "chore: update state $(date -u +%FT%TZ)"
+            git push
+          else
+            echo "state unchanged, skip commit"
+          fi
