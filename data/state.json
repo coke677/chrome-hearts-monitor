@@ -9,51 +9,6 @@
       "sold_out": false,
       "url": "https://www.chromehearts.com/intimates/ch-plus-tights/092826AI6XXXXXX.html"
     },
-    "146053XXXXXX00R": {
-      "category": "scents",
-      "id": "146053XXXXXX00R",
-      "image": "https://www.chromehearts.com/dw/image/v2/BFBV_PRD/on/demandware.static/-/Sites-ch-master-catalog/default/dw15925e5b/img_products/hi-res/146053XXXXXX142_1.png?sw=800&sh=1000",
-      "name": "+22+ Incense Set with Holder",
-      "price": "$200",
-      "sold_out": false,
-      "url": "https://www.chromehearts.com/scents/22-incense-set-with-holder/146053XXXXXX00R.html"
-    },
-    "146053XXXXXX142": {
-      "category": "scents",
-      "id": "146053XXXXXX142",
-      "image": "https://www.chromehearts.com/dw/image/v2/BFBV_PRD/on/demandware.static/-/Sites-ch-master-catalog/default/dw15925e5b/img_products/hi-res/146053XXXXXX142_1.png?sw=800&sh=1000",
-      "name": "+33+ Incense Set with Holder",
-      "price": "$200",
-      "sold_out": false,
-      "url": "https://www.chromehearts.com/scents/33-incense-set-with-holder/146053XXXXXX142.html"
-    },
-    "148310SLVXXX186": {
-      "category": "scents",
-      "id": "148310SLVXXX186",
-      "image": "https://www.chromehearts.com/dw/image/v2/BFBV_PRD/on/demandware.static/-/Sites-ch-master-catalog/default/dw9d7b3726/img_products/hi-res/148310SLVXXX186_1.png?sw=800&sh=1000",
-      "name": "Matchstick Holder",
-      "price": "$1,500",
-      "sold_out": true,
-      "url": "https://www.chromehearts.com/scents/matchstick-holder/148310SLVXXX186.html"
-    },
-    "151407XXXXXX00S": {
-      "category": "scents",
-      "id": "151407XXXXXX00S",
-      "image": "https://www.chromehearts.com/dw/image/v2/BFBV_PRD/on/demandware.static/-/Sites-ch-master-catalog/default/dw64d9efff/img_products/hi-res/151407XXXXXX169_1.png?sw=800&sh=1000",
-      "name": "+22+ Incense Refill",
-      "price": "$100",
-      "sold_out": false,
-      "url": "https://www.chromehearts.com/scents/22-incense-refill/151407XXXXXX00S.html"
-    },
-    "151407XXXXXX169": {
-      "category": "scents",
-      "id": "151407XXXXXX169",
-      "image": "https://www.chromehearts.com/dw/image/v2/BFBV_PRD/on/demandware.static/-/Sites-ch-master-catalog/default/dw64d9efff/img_products/hi-res/151407XXXXXX169_1.png?sw=800&sh=1000",
-      "name": "+33+ Incense Refill",
-      "price": "$100",
-      "sold_out": false,
-      "url": "https://www.chromehearts.com/scents/33-incense-refill/151407XXXXXX169.html"
-    },
     "158552BLKXXXXXX": {
       "category": "boxers-leggings",
       "id": "158552BLKXXXXXX",
@@ -396,24 +351,6 @@
       "sold_out": false,
       "url": "https://www.chromehearts.com/boxers-leggings/foti-boxer-brief---long/208280XXXXXXXXX.html"
     },
-    "208531BLUXXX752": {
-      "category": "scents",
-      "id": "208531BLUXXX752",
-      "image": "https://www.chromehearts.com/dw/image/v2/BFBV_PRD/on/demandware.static/-/Sites-ch-master-catalog/default/dw85653ba2/img_products/hi-res/511208531BLUXXX752_2431.png?sw=800&sh=1000",
-      "name": "+33+ Perfumed Hand Spray",
-      "price": "$110",
-      "sold_out": false,
-      "url": "https://www.chromehearts.com/scents/33-perfumed-hand-spray/208531BLUXXX752.html"
-    },
-    "208531PNKXXX751": {
-      "category": "scents",
-      "id": "208531PNKXXX751",
-      "image": "https://www.chromehearts.com/dw/image/v2/BFBV_PRD/on/demandware.static/-/Sites-ch-master-catalog/default/dwd89c28bc/img_products/hi-res/511208531PNKXXX751_0287.png?sw=800&sh=1000",
-      "name": "+22+ Perfumed Hand Spray",
-      "price": "$110",
-      "sold_out": false,
-      "url": "https://www.chromehearts.com/scents/22-perfumed-hand-spray/208531PNKXXX751.html"
-    },
     "209670XXXXXXXXX": {
       "category": "boxers-leggings",
       "id": "209670XXXXXXXXX",
@@ -422,25 +359,7 @@
       "price": "$120",
       "sold_out": false,
       "url": "https://www.chromehearts.com/boxers-leggings/boxer-brief---classic-rib/209670XXXXXXXXX.html"
-    },
-    "214141D7BXXX01S": {
-      "category": "scents",
-      "id": "214141D7BXXX01S",
-      "image": "https://www.chromehearts.com/dw/image/v2/BFBV_PRD/on/demandware.static/-/Sites-ch-master-catalog/default/dwf83d7130/img_products/hi-res/511214141D7BXXX01S_0475-2.png?sw=800&sh=1000",
-      "name": "+22+ Scented Candle Set 35G",
-      "price": "$150",
-      "sold_out": true,
-      "url": "https://www.chromehearts.com/scents/22-scented-candle-set-35g/214141D7BXXX01S.html"
-    },
-    "214141D7BXXX01T": {
-      "category": "scents",
-      "id": "214141D7BXXX01T",
-      "image": "https://www.chromehearts.com/dw/image/v2/BFBV_PRD/on/demandware.static/-/Sites-ch-master-catalog/default/dw59422a4a/img_products/hi-res/511214141D7BXXX01T_0475-2.png?sw=800&sh=1000",
-      "name": "+33+ Scented Candle Set 35G",
-      "price": "$150",
-      "sold_out": true,
-      "url": "https://www.chromehearts.com/scents/33-scented-candle-set-35g/214141D7BXXX01T.html"
     }
   },
-  "updated_at": "2026-09-09T19:11:28.529422+00:00"
+  "updated_at": "2026-09-09T20:13:12.175004+00:00"
 }
