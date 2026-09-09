@@ -285,7 +285,7 @@
       "image": "https://www.chromehearts.com/dw/image/v2/BFBV_PRD/on/demandware.static/-/Sites-ch-master-catalog/default/dw2ab22df2/img_products/hi-res/179527XXXXXX273_1.png?sw=800&sh=1000",
       "name": "+22+ Soap on a Rope",
       "price": "$90",
-      "sold_out": false,
+      "sold_out": true,
       "url": "https://www.chromehearts.com/scents/22-soap-on-a-rope/179527XXXXXX273.html"
     },
     "179527XXXXXX274": {
@@ -442,5 +442,5 @@
       "url": "https://www.chromehearts.com/scents/33-scented-candle-set-35g/214141D7BXXX01T.html"
     }
   },
-  "updated_at": "2026-09-09T15:12:47.171568+00:00"
+  "updated_at": "2026-09-09T16:13:56.334398+00:00"
 }
