@@ -36,15 +36,28 @@ from bs4 import BeautifulSoup
 
 BASE = "https://www.chromehearts.com"
 
-# 官网当前在线可购品类（2026-09 探测所得）。可用环境变量 CH_CATEGORIES 覆盖（逗号分隔）。
-DEFAULT_CATEGORIES = [
+# 已知在线品类的兜底清单（官网会动态增删品类，脚本每次运行还会从首页导航自动发现新品类）。
+BASELINE_CATEGORIES = [
     "scents",
     "baccarat",
     "boxers-leggings",
     "intimates",
     "socks",
     "scarf",
+    "hat",
 ]
+
+# 首页导航里这些单段链接不是商品品类，发现时跳过。
+IGNORE_SLUGS = {
+    "", "home", "general", "stores", "store", "store-locator", "storelocator",
+    "magazine", "world", "world-of-chrome-hearts", "about", "contact",
+    "customer-care", "customercare", "care", "faq", "faqs", "shipping",
+    "returns", "privacy", "terms", "legal", "accessibility", "careers",
+    "jobs", "press", "account", "login", "logout", "register", "signin",
+    "sign-in", "wishlist", "cart", "bag", "checkout", "search", "sitemap",
+    "authorized-retailers", "retailers", "gift-card", "gift-cards",
+    "newsletter", "subscribe", "en", "us", "en_us", "en-us",
+}
 
 UA = ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
       "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36")
@@ -68,7 +81,10 @@ def env_bool(name, default=False):
 class Config:
     def __init__(self):
         cats = env("CH_CATEGORIES")
-        self.categories = [c.strip() for c in cats.split(",") if c.strip()] if cats else list(DEFAULT_CATEGORIES)
+        # CH_CATEGORIES：额外/指定要监控的品类（逗号分隔）；留空则用兜底清单 + 自动发现。
+        self.extra_categories = [c.strip() for c in cats.split(",") if c.strip()] if cats else []
+        # 每次运行从首页导航自动发现当前所有品类（应对官网动态增删品类，如新出的 hat）。
+        self.discover = env_bool("CH_DISCOVER", True)
         self.state_file = env("STATE_FILE", os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "state.json"))
         self.detail_fetch = env_bool("DETAIL_FETCH", True)          # 通知时抓详情页取码数
         self.notify_price_change = env_bool("NOTIFY_PRICE_CHANGE", True)
@@ -101,17 +117,72 @@ def make_session():
 
 
 def fetch(session, url, cfg, tries=3):
+    return fetch_full(session, url, cfg, tries=tries)[0]
+
+
+def fetch_full(session, url, cfg, tries=3):
+    """返回 (html, 最终URL)。requests 默认跟随重定向，最终URL用于识别品类页跳转到的单商品。"""
     last = None
     for i in range(tries):
         try:
             r = session.get(url, timeout=cfg.timeout)
             if r.status_code == 200 and r.text:
-                return r.text
+                return r.text, r.url
             last = f"HTTP {r.status_code}"
         except Exception as e:  # noqa
             last = str(e)
         time.sleep(1.5 * (i + 1))
     raise RuntimeError(f"抓取失败 {url}: {last}")
+
+
+# --------------------------------------------------------------------------- #
+# 动态发现品类（官网会动态增删品类）
+# --------------------------------------------------------------------------- #
+CATEGORY_SLUG_RE = re.compile(r"^/([a-z0-9][a-z0-9-]*)/?$")
+
+
+def discover_categories(session, cfg):
+    """从首页导航自动发现当前的单段品类链接。失败时返回空表（不影响兜底清单）。"""
+    try:
+        html, _ = fetch_full(session, BASE, cfg)
+    except Exception as e:  # noqa
+        print(f"[warn] 首页抓取失败，跳过自动发现：{e}", file=sys.stderr)
+        return []
+    soup = BeautifulSoup(html, "html.parser")
+    found = []
+    seen = set()
+    for a in soup.select("a[href]"):
+        href = (a.get("href") or "").split("?")[0].split("#")[0]
+        m = CATEGORY_SLUG_RE.match(href)
+        if not m:
+            continue
+        slug = m.group(1)
+        if slug in IGNORE_SLUGS or slug in seen:
+            continue
+        seen.add(slug)
+        found.append(slug)
+    return found[:40]
+
+
+# --------------------------------------------------------------------------- #
+# 抓取一个品类：可能是商品网格，也可能（品类只有一件时）跳转到单商品详情页
+# --------------------------------------------------------------------------- #
+def scrape_category(session, cat, cfg):
+    url = f"{BASE}/{cat}"
+    try:
+        html, final_url = fetch_full(session, url, cfg)
+    except Exception as e:  # noqa
+        print(f"[warn] 品类 {cat} 抓取失败，跳过：{e}", file=sys.stderr)
+        return {}
+    products = parse_category(html, cat)
+    if products:
+        return products
+    # 品类页跳转到了单个商品详情页（该品类当前只有一件）
+    if "application/ld+json" in html and '"@type":"Product"' in html.replace(" ", ""):
+        one = parse_single_product(html, final_url, cat)
+        if one:
+            return one
+    return {}
 
 
 # --------------------------------------------------------------------------- #
@@ -183,6 +254,75 @@ def parse_category(html_text, category):
             "category": category,
         }
     return products
+
+
+def _first_product_image(soup):
+    for img in soup.select("img"):
+        src = img.get("src") or ""
+        if not src:
+            ss = img.get("srcset", "")
+            if ss:
+                src = ss.split(",")[0].strip().split(" ")[0]
+        if src and "img_products/hi-res" in src:
+            src = htmllib.unescape(src)
+            if src.startswith("//"):
+                src = "https:" + src
+            elif src.startswith("/"):
+                src = BASE + src
+            return src
+    return ""
+
+
+def parse_single_product(html_text, final_url, category):
+    """把一个（品类跳转到的）单商品详情页解析成 {pid: product}，字段与品类页一致。"""
+    soup = BeautifulSoup(html_text, "html.parser")
+    # 商品URL：优先 canonical / og:url，退回 final_url
+    url = None
+    link = soup.select_one('link[rel="canonical"]')
+    if link and link.get("href"):
+        url = link["href"]
+    if not url:
+        og = soup.select_one('meta[property="og:url"]')
+        if og and og.get("content"):
+            url = og["content"]
+    if not url:
+        url = final_url
+    url = (url or "").split("?")[0]
+    if url.startswith("/"):
+        url = BASE + url
+    pid = product_id_from_href(url)
+    if not pid:
+        return {}
+    # 名称 / 价格 / 库存
+    name = None
+    availability = None
+    for s in soup.select('script[type="application/ld+json"]'):
+        raw = s.string or s.get_text()
+        if not raw:
+            continue
+        try:
+            data = json.loads(raw)
+        except Exception:  # noqa
+            continue
+        for d in (data if isinstance(data, list) else [data]):
+            if isinstance(d, dict) and d.get("@type") == "Product":
+                name = name or d.get("name")
+                offers = d.get("offers") or {}
+                if isinstance(offers, dict):
+                    availability = offers.get("availability")
+    if not name:
+        h1 = soup.select_one("h1")
+        name = _clean(h1.get_text()) if h1 else pid
+    name = _clean(name)
+    price_el = soup.select_one(".price")
+    price = _clean(price_el.get_text(" ", strip=True)) if price_el else ""
+    sold_out = (availability and "instock" not in availability.lower()) or \
+        (soup.select_one("a.soldout") is not None)
+    image = _first_product_image(soup)
+    return {pid: {
+        "id": pid, "name": name, "price": price, "image": image,
+        "sold_out": bool(sold_out), "url": url, "category": category,
+    }}
 
 
 # --------------------------------------------------------------------------- #
@@ -491,21 +631,36 @@ def send_all(cfg, title, markdown, plaintext, changes, dry_run=False):
 # --------------------------------------------------------------------------- #
 def run(cfg, dry_run=False):
     session = make_session()
+
+    # 组装要监控的品类：自动发现 ∪ 兜底清单 ∪ 用户指定的额外品类
+    categories = []
+    seen = set()
+
+    def _add(slugs):
+        for s in slugs:
+            if s and s not in seen:
+                seen.add(s)
+                categories.append(s)
+
+    if cfg.discover:
+        discovered = discover_categories(session, cfg)
+        if discovered:
+            print(f"[info] 自动发现品类：{', '.join(discovered)}")
+        _add(discovered)
+    _add(BASELINE_CATEGORIES)
+    _add(cfg.extra_categories)
+
     current = {}
     fetched_categories = []
-    for cat in cfg.categories:
-        url = f"{BASE}/{cat}"
-        try:
-            html_text = fetch(session, url, cfg)
-            got = parse_category(html_text, cat)
-            if not got:
-                print(f"[warn] 品类 {cat} 未解析到商品，跳过（避免误报），请检查页面是否改版/被拦截。", file=sys.stderr)
-                continue
-            current.update(got)
-            fetched_categories.append(cat)
-            print(f"[ok] {cat}: {len(got)} 件")
-        except Exception as e:  # noqa
-            print(f"[warn] 品类 {cat} 抓取失败，跳过：{e}", file=sys.stderr)
+    for cat in categories:
+        got = scrape_category(session, cat, cfg)
+        if not got:
+            # 无商品（可能是非商品页/已下线/被拦截）——静默跳过，避免误报下架
+            time.sleep(cfg.request_delay)
+            continue
+        current.update(got)
+        fetched_categories.append(cat)
+        print(f"[ok] {cat}: {len(got)} 件")
         time.sleep(cfg.request_delay)
 
     if not fetched_categories:
