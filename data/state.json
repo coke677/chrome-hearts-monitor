@@ -1,5 +1,14 @@
 {
   "products": {
+    "053702REDXXX316": {
+      "category": "hat",
+      "id": "053702REDXXX316",
+      "image": "https://www.chromehearts.com/dw/image/v2/BFBV_PRD/on/demandware.static/-/Sites-ch-master-catalog/default/dwf7dab027/img_products/hi-res/304053702C4BXXX316_0824-_Red.png?sw=540&sh=675",
+      "name": "RED WATCH CAP",
+      "price": "$245",
+      "sold_out": false,
+      "url": "https://www.chromehearts.com/hat/red-watch-cap/053702REDXXX316.html"
+    },
     "092826AI6XXXXXX": {
       "category": "intimates",
       "id": "092826AI6XXXXXX",
@@ -361,5 +370,5 @@
       "url": "https://www.chromehearts.com/boxers-leggings/boxer-brief---classic-rib/209670XXXXXXXXX.html"
     }
   },
-  "updated_at": "2026-09-11T04:13:53.630019+00:00"
+  "updated_at": "2026-09-11T04:50:16.765215+00:00"
 }
