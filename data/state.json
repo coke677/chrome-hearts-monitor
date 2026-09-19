@@ -78,7 +78,7 @@
       "image": "https://www.chromehearts.com/dw/image/v2/BFBV_PRD/on/demandware.static/-/Sites-ch-master-catalog/default/dwc5641986/img_products/hi-res/162045CRYXXX273_1.png?sw=800&sh=1000",
       "name": "+22+ Scented Candle 220g",
       "price": "$500",
-      "sold_out": false,
+      "sold_out": true,
       "url": "https://www.chromehearts.com/scents/22-scented-candle-220g/162045CRYXXX273.html"
     },
     "162045CRYXXX274": {
@@ -370,5 +370,5 @@
       "url": "https://www.chromehearts.com/boxers-leggings/boxer-brief---classic-rib/209670XXXXXXXXX.html"
     }
   },
-  "updated_at": "2026-09-19T04:12:41.071664+00:00"
+  "updated_at": "2026-09-19T05:11:28.874000+00:00"
 }
