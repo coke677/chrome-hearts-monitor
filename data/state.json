@@ -231,7 +231,7 @@
       "image": "https://www.chromehearts.com/dw/image/v2/bfbv_prd/on/demandware.static/-/Sites-ch-master-catalog/default/dwf379530c/img_products/hi-res/503177733CRYXXX042_0649.png?sw=800&sh=1000",
       "name": "WINE",
       "price": "$2,200",
-      "sold_out": false,
+      "sold_out": true,
       "url": "https://www.chromehearts.com/baccarat/wine/177733CRYXXX042.html"
     },
     "177734CRYXXX042": {
@@ -370,5 +370,5 @@
       "url": "https://www.chromehearts.com/boxers-leggings/boxer-brief---classic-rib/209670XXXXXXXXX.html"
     }
   },
-  "updated_at": "2026-09-27T09:12:12.884583+00:00"
+  "updated_at": "2026-09-27T10:12:16.373775+00:00"
 }
