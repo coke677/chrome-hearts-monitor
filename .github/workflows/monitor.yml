@@ -2,21 +2,23 @@ name: Chrome Hearts Monitor
 
 on:
   schedule:
-    - cron: "0 * * * *"
-  workflow_dispatch: {}
-  push:
-    branches: [ main ]
+    - cron: "0 * * * *"      # 每小时的第 0 分钟运行（UTC；GitHub 可能延迟几分钟）
+  workflow_dispatch: {}       # 允许在 Actions 页面手动触发
+  # 注意：故意不加 push 触发。否则"把 state 提交回仓库"那步会再次触发自己，
+  # 造成运行量翻倍、互相取消(cancelled)、并多耗免费额度。
 
+# 避免两次运行同时写状态
 concurrency:
   group: ch-monitor
   cancel-in-progress: false
 
 permissions:
-  contents: write
+  contents: write             # 允许把更新后的 data/state.json 提交回仓库
 
 jobs:
   check:
     runs-on: ubuntu-latest
+    timeout-minutes: 10         # 兜底：官网卡住时不至于长时间占用额度
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -31,11 +33,13 @@ jobs:
 
       - name: Run monitor
         env:
+          # ==== 推送渠道（在仓库 Settings → Secrets 里配置，至少配一个）====
           SERVERCHAN_SENDKEY: ${{ secrets.SERVERCHAN_SENDKEY }}
           PUSHPLUS_TOKEN:     ${{ secrets.PUSHPLUS_TOKEN }}
           PUSHPLUS_TOPIC:     ${{ secrets.PUSHPLUS_TOPIC }}
           BARK_KEY:           ${{ secrets.BARK_KEY }}
           WEBHOOK_URL:        ${{ secrets.WEBHOOK_URL }}
+          # ==== 可选行为开关（也可在这里改，或用 Actions Variables）====
           CH_CATEGORIES:       ${{ vars.CH_CATEGORIES }}
           NOTIFY_PRICE_CHANGE: ${{ vars.NOTIFY_PRICE_CHANGE }}
           NOTIFY_REMOVED:      ${{ vars.NOTIFY_REMOVED }}
@@ -49,8 +53,8 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           if [ -n "$(git status --porcelain data/state.json)" ]; then
             git add data/state.json
-            git commit -m "chore: update state $(date -u +%FT%TZ)"
+            git commit -m "chore: update state $(date -u +%FT%TZ) [skip ci]"
             git push
           else
-            echo "state unchanged, skip commit"
+            echo "state 无变化，跳过提交"
           fi
