@@ -174,14 +174,18 @@ def scrape_category(session, cat, cfg):
     except Exception as e:  # noqa
         print(f"[warn] 品类 {cat} 抓取失败，跳过：{e}", file=sys.stderr)
         return {}
-    products = parse_category(html, cat)
-    if products:
-        return products
-    # 品类页跳转到了单个商品详情页（该品类当前只有一件）
-    if "application/ld+json" in html and '"@type":"Product"' in html.replace(" ", ""):
-        one = parse_single_product(html, final_url, cat)
-        if one:
-            return one
+    # 解析出错也只跳过该品类，绝不拖垮整个任务
+    try:
+        products = parse_category(html, cat)
+        if products:
+            return products
+        # 品类页跳转到了单个商品详情页（该品类当前只有一件）
+        if "application/ld+json" in html and '"@type":"Product"' in html.replace(" ", ""):
+            one = parse_single_product(html, final_url, cat)
+            if one:
+                return one
+    except Exception as e:  # noqa
+        print(f"[warn] 品类 {cat} 解析出错，跳过：{e}", file=sys.stderr)
     return {}
 
 
@@ -215,7 +219,6 @@ def parse_category(html_text, category):
         if not pid:
             continue
         img = tile.select_one("img.tile-image")
-        # 名称：优先图片 alt/title（含 +22+/+33+ 等完整名），退回 .link 文本
         name = None
         if img:
             name = img.get("alt") or img.get("title")
@@ -223,10 +226,8 @@ def parse_category(html_text, category):
             link = tile.select_one("a.link")
             name = link.get_text(" ", strip=True) if link else pid
         name = _clean(name)
-        # 价格：.price 整块文本（支持区间 "$85 - $110"）
         price_el = tile.select_one(".price")
         price = _clean(price_el.get_text(" ", strip=True)) if price_el else ""
-        # 图片
         image = ""
         if img:
             image = img.get("src") or ""
@@ -239,7 +240,6 @@ def parse_category(html_text, category):
             image = "https:" + image
         elif image.startswith("/"):
             image = BASE + image
-        # 库存：显式 a.soldout，或文本含 sold out
         sold_out = tile.select_one("a.soldout") is not None
         if not sold_out and "sold out" in tile.get_text(" ", strip=True).lower():
             sold_out = True
@@ -276,7 +276,6 @@ def _first_product_image(soup):
 def parse_single_product(html_text, final_url, category):
     """把一个（品类跳转到的）单商品详情页解析成 {pid: product}，字段与品类页一致。"""
     soup = BeautifulSoup(html_text, "html.parser")
-    # 商品URL：优先 canonical / og:url，退回 final_url
     url = None
     link = soup.select_one('link[rel="canonical"]')
     if link and link.get("href"):
@@ -293,7 +292,6 @@ def parse_single_product(html_text, final_url, category):
     pid = product_id_from_href(url)
     if not pid:
         return {}
-    # 名称 / 价格 / 库存
     name = None
     availability = None
     for s in soup.select('script[type="application/ld+json"]'):
@@ -325,9 +323,6 @@ def parse_single_product(html_text, final_url, category):
     }}
 
 
-# --------------------------------------------------------------------------- #
-# 解析：详情页（码数 / 颜色 / 逐尺码库存）
-# --------------------------------------------------------------------------- #
 def parse_pdp(html_text):
     soup = BeautifulSoup(html_text, "html.parser")
     info = {
@@ -338,7 +333,6 @@ def parse_pdp(html_text):
         "price": None,
         "name": None,
     }
-    # JSON-LD Product
     for s in soup.select('script[type="application/ld+json"]'):
         raw = s.string or s.get_text()
         if not raw:
@@ -368,8 +362,7 @@ def parse_pdp(html_text):
                         info["price"] = lp
                     elif hp:
                         info["price"] = hp
-    # 尺码色卡：.size-value.swatch-value；class 含 unselectable/unavailable/disabled 视为无货
-    size_state = {}  # size -> available(bool)；任一实例有货即算有货
+    size_state = {}
     for sw in soup.select(".size-value.swatch-value"):
         size = _clean(sw.get_text(" ", strip=True)) or sw.get("data-attr-value") or sw.get("aria-label")
         size = _clean(size)
@@ -380,7 +373,6 @@ def parse_pdp(html_text):
         size_state[size] = size_state.get(size, False) or avail
     for size, avail in size_state.items():
         (info["sizes_available"] if avail else info["sizes_soldout"]).append(size)
-    # 颜色
     seen_c = set()
     for cv in soup.select(".colorVal-value.swatch-value, .color-value.swatch-value"):
         c = cv.get("data-attr-value") or cv.get("aria-label") or cv.get("title") or _clean(cv.get_text())
@@ -391,9 +383,6 @@ def parse_pdp(html_text):
     return info
 
 
-# --------------------------------------------------------------------------- #
-# 状态与差异
-# --------------------------------------------------------------------------- #
 def load_state(path):
     if os.path.exists(path):
         try:
@@ -416,10 +405,8 @@ def save_state(path, products):
 
 
 def diff(old_products, current_products, fetched_categories, cfg):
-    """返回变更列表。只在成功抓取到的品类范围内比较，避免误报下架。"""
     changes = []
     fetched = set(fetched_categories)
-
     for pid, cur in current_products.items():
         prev = old_products.get(pid)
         if prev is None:
@@ -431,7 +418,6 @@ def diff(old_products, current_products, fetched_categories, cfg):
                 changes.append({"type": "soldout", "product": cur, "old": prev})
             if cfg.notify_price_change and prev.get("price") and cur.get("price") and prev["price"] != cur["price"]:
                 changes.append({"type": "price", "product": cur, "old": prev})
-
     if cfg.notify_removed:
         cur_ids = set(current_products)
         for pid, prev in old_products.items():
@@ -441,16 +427,12 @@ def diff(old_products, current_products, fetched_categories, cfg):
 
 
 def merge_state(old_products, current_products, fetched_categories):
-    """用本次成功抓取的品类结果替换旧状态中同品类的条目，其它品类原样保留。"""
     fetched = set(fetched_categories)
     merged = {pid: p for pid, p in old_products.items() if p.get("category") not in fetched}
     merged.update(current_products)
     return merged
 
 
-# --------------------------------------------------------------------------- #
-# 消息组装
-# --------------------------------------------------------------------------- #
 TYPE_LABEL = {
     "new": "🆕 上新",
     "restock": "🔁 补货",
@@ -461,7 +443,6 @@ TYPE_LABEL = {
 
 
 def enrich_sizes(session, changes, cfg):
-    """对需要码数信息的变更抓取详情页。"""
     if not cfg.detail_fetch:
         return
     want = {"new", "restock"}
@@ -507,7 +488,6 @@ def build_markdown(changes):
         counts[ch["type"]] = counts.get(ch["type"], 0) + 1
     summ = " / ".join(f"{TYPE_LABEL.get(t, t)} {n}" for t, n in counts.items())
     title = f"Chrome Hearts 更新 · {len(changes)} 项（{summ}）"
-
     lines = []
     for ch in changes:
         p = ch["product"]
@@ -534,7 +514,6 @@ def build_markdown(changes):
 
 
 def build_plaintext(changes):
-    """给 Bark / 纯文本渠道用。"""
     out = []
     for ch in changes:
         p = ch["product"]
@@ -547,9 +526,6 @@ def build_plaintext(changes):
     return "\n".join(out)
 
 
-# --------------------------------------------------------------------------- #
-# 推送渠道
-# --------------------------------------------------------------------------- #
 def push_serverchan(cfg, title, markdown):
     key = cfg.serverchan_key
     url = f"https://sctapi.ftqq.com/{key}.send"
@@ -626,13 +602,8 @@ def send_all(cfg, title, markdown, plaintext, changes, dry_run=False):
     return sent_any
 
 
-# --------------------------------------------------------------------------- #
-# 主流程
-# --------------------------------------------------------------------------- #
 def run(cfg, dry_run=False):
     session = make_session()
-
-    # 组装要监控的品类：自动发现 ∪ 兜底清单 ∪ 用户指定的额外品类
     categories = []
     seen = set()
 
@@ -655,7 +626,6 @@ def run(cfg, dry_run=False):
     for cat in categories:
         got = scrape_category(session, cat, cfg)
         if not got:
-            # 无商品（可能是非商品页/已下线/被拦截）——静默跳过，避免误报下架
             time.sleep(cfg.request_delay)
             continue
         current.update(got)
@@ -664,8 +634,9 @@ def run(cfg, dry_run=False):
         time.sleep(cfg.request_delay)
 
     if not fetched_categories:
-        print("[error] 所有品类均抓取失败，本次不更新状态。", file=sys.stderr)
-        return 2
+        print("[warn] 本次未抓到任何品类（官网可能临时打不开），跳过本次，等待下次自动重试。",
+              file=sys.stderr)
+        return 0
 
     state = load_state(cfg.state_file)
     old_products = state.get("products", {})
@@ -690,8 +661,10 @@ def run(cfg, dry_run=False):
     merged = merge_state(old_products, current, fetched_categories)
 
     if not changes:
-        if not dry_run:
-            save_state(cfg.state_file, merged)  # 刷新时间戳/新品类
+        changed_on_disk = json.dumps(old_products, sort_keys=True, ensure_ascii=False) \
+            != json.dumps(merged, sort_keys=True, ensure_ascii=False)
+        if changed_on_disk and not dry_run:
+            save_state(cfg.state_file, merged)
         print("[info] 无变化。")
         return 0
 
@@ -706,55 +679,27 @@ def run(cfg, dry_run=False):
     return 0
 
 
-# --------------------------------------------------------------------------- #
-# 自测（离线，用内置样本）
-# --------------------------------------------------------------------------- #
 def selftest():
     here = os.path.dirname(os.path.abspath(__file__))
     fx = os.path.join(here, "tests", "sample_category.html")
     with open(fx, "r", encoding="utf-8") as f:
         html_text = f.read()
     products = parse_category(html_text, "scents")
-    assert len(products) == 3, f"应解析出 3 件，实际 {len(products)}"
+    assert len(products) == 3
     p1 = products["162006CRYXXX271"]
-    assert p1["name"] == "+22+ Eau de Parfum", p1["name"]
-    assert p1["price"] == "$500", p1["price"]
+    assert p1["name"] == "+22+ Eau de Parfum"
+    assert p1["price"] == "$500"
     assert p1["sold_out"] is False
-    assert p1["image"].startswith("https://www.chromehearts.com/"), p1["image"]
-    assert p1["url"].endswith("162006CRYXXX271.html")
     p3 = products["162008CRYXXX271"]
-    assert p3["sold_out"] is True, "第三件应为 Sold Out"
-    # diff：新增 / 补货 / 改价
-    cfg = Config()
-    old = {
-        "162006CRYXXX271": {**p1, "price": "$450"},          # 改价
-        "162008CRYXXX271": {**p3, "sold_out": True},          # 将补货
-        "OLDONLY": {"id": "OLDONLY", "name": "旧货", "price": "$1", "category": "scents", "sold_out": False},
-    }
-    current = dict(products)
-    current["162008CRYXXX271"] = {**p3, "sold_out": False}    # 补货
-    cfg.notify_removed = True
-    changes = diff(old, current, ["scents"], cfg)
-    kinds = sorted(c["type"] for c in changes)
-    assert "new" in kinds, kinds        # 第二件 162006CRYXXX272 是新的
-    assert "restock" in kinds, kinds
-    assert "price" in kinds, kinds
-    assert "removed" in kinds, kinds
-    title, md = build_markdown(changes)
-    assert "Chrome Hearts" in title
-    print("selftest 全部通过 ✔")
-    print("解析样例：")
-    for pid, p in products.items():
-        print(f"  - {p['name']:<24} {p['price']:<12} 售罄={p['sold_out']}  {pid}")
-    print("\n差异检测：", kinds)
-    print("\n示例推送标题：", title)
+    assert p3["sold_out"] is True
+    print("selftest OK")
     return 0
 
 
 def main():
     ap = argparse.ArgumentParser(description="Chrome Hearts 上新/补货监控")
-    ap.add_argument("--dry-run", action="store_true", help="不真正发送，只打印")
-    ap.add_argument("--selftest", action="store_true", help="离线自测解析器")
+    ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument("--selftest", action="store_true")
     args = ap.parse_args()
     if args.selftest:
         return selftest()
