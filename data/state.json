@@ -258,7 +258,7 @@
       "image": "https://www.chromehearts.com/dw/image/v2/bfbv_prd/on/demandware.static/-/Sites-ch-master-catalog/default/dwb01f7240/img_products/hi-res/503177731CRYXXX042_0661.png?sw=800&sh=1000",
       "name": "CHAMPAGNE FLUTE",
       "price": "$2,800",
-      "sold_out": false,
+      "sold_out": true,
       "url": "https://www.chromehearts.com/baccarat/champagne-flute/177731CRYXXX042.html"
     },
     "177732CRYXXX042": {
@@ -451,5 +451,5 @@
       "url": "https://www.chromehearts.com/scents/33-scented-candle-set-35g/214141D7BXXX01T.html"
     }
   },
-  "updated_at": "2026-10-09T18:41:21.864074+00:00"
+  "updated_at": "2026-10-17T06:42:08.511707+00:00"
 }
