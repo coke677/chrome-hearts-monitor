@@ -60,7 +60,7 @@
       "image": "https://www.chromehearts.com/dw/image/v2/bfbv_prd/on/demandware.static/-/Sites-ch-master-catalog/default/dwa1c19b4a/img_products/hi-res/162008CRYXXX271_1.png?sw=800&sh=1000",
       "name": "+22+ Roll-On Perfume",
       "price": "$220",
-      "sold_out": true,
+      "sold_out": false,
       "url": "https://www.chromehearts.com/scents/22-roll-on-perfume/162008CRYXXX271.html"
     },
     "162008CRYXXX272": {
@@ -78,7 +78,7 @@
       "image": "https://www.chromehearts.com/dw/image/v2/bfbv_prd/on/demandware.static/-/Sites-ch-master-catalog/default/dwc5641986/img_products/hi-res/162045CRYXXX273_1.png?sw=800&sh=1000",
       "name": "+22+ Scented Candle 220g",
       "price": "$500",
-      "sold_out": true,
+      "sold_out": false,
       "url": "https://www.chromehearts.com/scents/22-scented-candle-220g/162045CRYXXX273.html"
     },
     "162045CRYXXX274": {
@@ -379,5 +379,5 @@
       "url": "https://www.chromehearts.com/boxers-leggings/boxer-brief---classic-rib/209670XXXXXXXXX.html"
     }
   },
-  "updated_at": "2026-10-27T19:53:22.611207+00:00"
+  "updated_at": "2026-10-29T16:42:29.092998+00:00"
 }
