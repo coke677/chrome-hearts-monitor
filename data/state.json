@@ -342,6 +342,15 @@
       "sold_out": false,
       "url": "https://www.chromehearts.com/intimates/lace-underwire-bra/202334AFWXXX030.html"
     },
+    "204651B2UMED07M": {
+      "category": "slippers",
+      "id": "204651B2UMED07M",
+      "image": "https://www.chromehearts.com/dw/image/v2/bfbv_prd/on/demandware.static/-/Sites-ch-master-catalog/default/dw21039a32/img_products/hi-res/308204651B2UMED07M_0605.png?sw=540&sh=675",
+      "name": "HOTEL SLIPPERS",
+      "price": "$595",
+      "sold_out": false,
+      "url": "https://www.chromehearts.com/slippers/hotel-slippers/204651B2UMED07M.html"
+    },
     "207467CRYXXX054": {
       "category": "baccarat",
       "id": "207467CRYXXX054",
@@ -377,7 +386,16 @@
       "price": "$130",
       "sold_out": false,
       "url": "https://www.chromehearts.com/boxers-leggings/boxer-brief---classic-rib/209670XXXXXXXXX.html"
+    },
+    "222575AEGXXX059": {
+      "category": "scarf",
+      "id": "222575AEGXXX059",
+      "image": "https://www.chromehearts.com/dw/image/v2/bfbv_prd/on/demandware.static/-/Sites-ch-master-catalog/default/dwb91adadb/img_products/hi-res/315222575AEGXXX059_0131_1.png?sw=540&sh=675",
+      "name": "MATH PLUS SCARF",
+      "price": "$375",
+      "sold_out": false,
+      "url": "https://www.chromehearts.com/scarf/math-plus-scarf/222575AEGXXX059.html"
     }
   },
-  "updated_at": "2026-10-29T16:42:29.092998+00:00"
+  "updated_at": "2026-11-06T21:21:41.909212+00:00"
 }
