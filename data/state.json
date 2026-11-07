@@ -393,9 +393,9 @@
       "image": "https://www.chromehearts.com/dw/image/v2/bfbv_prd/on/demandware.static/-/Sites-ch-master-catalog/default/dwb91adadb/img_products/hi-res/315222575AEGXXX059_0131_1.png?sw=540&sh=675",
       "name": "MATH PLUS SCARF",
       "price": "$375",
-      "sold_out": false,
+      "sold_out": true,
       "url": "https://www.chromehearts.com/scarf/math-plus-scarf/222575AEGXXX059.html"
     }
   },
-  "updated_at": "2026-11-06T21:21:41.909212+00:00"
+  "updated_at": "2026-11-07T19:58:11.566655+00:00"
 }
