@@ -387,6 +387,15 @@
       "sold_out": false,
       "url": "https://www.chromehearts.com/boxers-leggings/boxer-brief---classic-rib/209670XXXXXXXXX.html"
     },
+    "21978827FE50010": {
+      "category": "eyewear",
+      "id": "21978827FE50010",
+      "image": "https://www.chromehearts.com/dw/image/v2/bfbv_prd/on/demandware.static/-/Sites-ch-master-catalog/default/dwfd89955b/img_products/hi-res/32421978827FE50010_0445.png?sw=540&sh=675",
+      "name": "MIO LORD",
+      "price": "$1,470",
+      "sold_out": false,
+      "url": "https://www.chromehearts.com/eyewear/mio-lord/21978827FE50010.html"
+    },
     "222575AEGXXX059": {
       "category": "scarf",
       "id": "222575AEGXXX059",
@@ -397,5 +406,5 @@
       "url": "https://www.chromehearts.com/scarf/math-plus-scarf/222575AEGXXX059.html"
     }
   },
-  "updated_at": "2026-11-07T19:58:11.566655+00:00"
+  "updated_at": "2026-11-12T23:17:37.629668+00:00"
 }
