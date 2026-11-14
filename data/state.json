@@ -51,7 +51,7 @@
       "image": "https://www.chromehearts.com/dw/image/v2/bfbv_prd/on/demandware.static/-/Sites-ch-master-catalog/default/dw2d88c1ce/img_products/hi-res/162006CRYXXX272_1.png?sw=800&sh=1000",
       "name": "+33+ Eau de Parfum",
       "price": "$500",
-      "sold_out": false,
+      "sold_out": true,
       "url": "https://www.chromehearts.com/scents/33-eau-de-parfum/162006CRYXXX272.html"
     },
     "162008CRYXXX271": {
@@ -406,5 +406,5 @@
       "url": "https://www.chromehearts.com/scarf/math-plus-scarf/222575AEGXXX059.html"
     }
   },
-  "updated_at": "2026-11-12T23:17:37.629668+00:00"
+  "updated_at": "2026-11-14T20:29:14.515437+00:00"
 }
