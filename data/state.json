@@ -306,15 +306,6 @@
       "sold_out": false,
       "url": "https://www.chromehearts.com/intimates/lace-high-waisted-brief/201583AFWXXX033.html"
     },
-    "201584AFWXXX030": {
-      "category": "intimates",
-      "id": "201584AFWXXX030",
-      "image": "https://www.chromehearts.com/dw/image/v2/bfbv_prd/on/demandware.static/-/Sites-ch-master-catalog/default/dw76bd9d63/img_products/hi-res/201584AFWXXX030-n1.png?sw=800&sh=1000",
-      "name": "LACE G-STRING",
-      "price": "$220",
-      "sold_out": true,
-      "url": "https://www.chromehearts.com/intimates/lace-g-string/201584AFWXXX030.html"
-    },
     "201585AFWXXX030": {
       "category": "intimates",
       "id": "201585AFWXXX030",
@@ -406,5 +397,5 @@
       "url": "https://www.chromehearts.com/scarf/math-plus-scarf/222575AEGXXX059.html"
     }
   },
-  "updated_at": "2026-11-16T18:02:26.336703+00:00"
+  "updated_at": "2026-11-17T02:20:36.582154+00:00"
 }
