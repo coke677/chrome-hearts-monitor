@@ -150,7 +150,7 @@
       "image": "https://www.chromehearts.com/dw/image/v2/bfbv_prd/on/demandware.static/-/Sites-ch-master-catalog/default/dw8e83cdfc/img_products/hi-res/503174132CRYXXX015_0695.png?sw=800&sh=1000",
       "name": "TUMBLER",
       "price": "$2,625",
-      "sold_out": false,
+      "sold_out": true,
       "url": "https://www.chromehearts.com/baccarat/tumbler/174132CRYXXX015.html"
     },
     "174310CRYXXX005": {
@@ -406,5 +406,5 @@
       "url": "https://www.chromehearts.com/scarf/math-plus-scarf/222575AEGXXX059.html"
     }
   },
-  "updated_at": "2026-11-18T11:16:01.032745+00:00"
+  "updated_at": "2026-11-20T19:03:16.728373+00:00"
 }
